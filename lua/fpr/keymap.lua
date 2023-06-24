@@ -16,9 +16,19 @@ m("n", "<A-9>", "<Cmd>BufferGoto 9<CR>", opts)
 m("n", "gt", "<Cmd>BufferNext<CR>", opts)
 m("n", "gT", "<Cmd>BufferPrevious<CR>", opts)
 
-m("n", [[<C-k><S-W>]], "<Cmd>BufferCloseAllButCurrent<CR>", opts) 
+m("n", [[<C-k><S-W>]], "<Cmd>BufferCloseAllButCurrent<CR>", opts)
 
-m("n", [[<C-k>x]], "<Cmd>ToggleTerm<CR>", opts) 
+m("n", [[<A-x>]], "<Cmd>ToggleTerm<CR>", opts)
+m("n", [[<C-k>x]], "<Cmd>TermSelect<CR>", opts)
+
+m("n", [[<C-k>l]], "<Cmd>winc l<CR>", opts)
+m("n", [[<C-k>h]], "<Cmd>winc h<CR>", opts)
+m("n", [[<C-k>k]], "<Cmd>winc k<CR>", opts)
+m("n", [[<C-k>j]], "<Cmd>winc j<CR>", opts)
+m("n", [[<C-k><S-l>]], "<Cmd>winc L<CR>", opts)
+m("n", [[<C-k><S-h>]], "<Cmd>winc H<CR>", opts)
+m("n", [[<C-k><S-k>]], "<Cmd>winc K<CR>", opts)
+m("n", [[<C-k><S-j>]], "<Cmd>winc J<CR>", opts)
 
 local lsp = require("lsp-zero")
 local cmp = require("cmp")
@@ -30,7 +40,7 @@ local cmpm = lsp.defaults.cmp_mappings({
     ["<CR>"] = cmp.mapping.confirm({ select = true }),
     ["<A-p>"] = cmp.mapping.scroll_docs(-4),
     ["<A-n>"] = cmp.mapping.scroll_docs(4),
-    ["<S-C>"] = cmp.mapping.complete(),
+    ["<A-I>"] = cmp.mapping.complete(),
 })
 
 lsp.on_attach(function(client, bufnr)
@@ -54,3 +64,35 @@ end)
 lsp.setup_nvim_cmp({
     mapping = cmpm
 })
+
+m("t", [[<C-k>l]], "<Cmd>winc l<CR>", {})
+m("t", [[<C-k>h]], "<Cmd>winc h<CR>", {})
+m("t", [[<C-k>k]], "<Cmd>winc k<CR>", {})
+m("t", [[<C-k>j]], "<Cmd>winc j<CR>", {})
+
+require("nvim-tree").setup({
+    on_attach = function(bufnr)
+        local api = require("nvim-tree.api")
+        local function opts(desc)
+            return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        end
+        vim.keymap.set("n", "o", api.node.open.edit, opts("Open"))
+        vim.keymap.set("n", "<2-LeftMouse>", api.node.open.edit, opts("Open"))
+        vim.keymap.set("n", "d", api.fs.remove, opts("Delete"))
+
+        vim.keymap.set("n", "R", api.tree.reload, opts("Reload"))
+
+        vim.keymap.set("n", "/", api.tree.search_node, opts("Search"))
+
+        vim.keymap.set("n", "c", api.fs.copy.relative_path, opts("Copy relative path"))
+        vim.keymap.set("n", "C", api.fs.copy.absolute_path, opts("Copy absoulte path"))
+
+        vim.keymap.set("n", "y", api.fs.copy.node, opts("Copy"))
+        vim.keymap.set("n", "p", api.fs.paste, opts("Paste"))
+        vim.keymap.set("n", "r", api.fs.rename, opts("Rename"))
+        vim.keymap.set("n", "?", api.tree.toggle_help, opts("Toggle Help"))
+    end
+})
+
+m("n", "<C-k>e", "<Cmd>NvimTreeFocus<CR>", opts)
+m("n", "<A-e>", "<Cmd>NvimTreeToggle<CR>", opts)

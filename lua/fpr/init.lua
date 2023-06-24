@@ -29,6 +29,20 @@ require("luasnip.loaders.from_snipmate").lazy_load {
     paths = vim.fn.stdpath "config" .. "/snippet"
 }
 
+require("toggleterm").setup {
+    hide_numbers = true,
+    winbar = {
+        enabled = false,
+    },
+}
+
+-- disable netrw at the very start of your init.lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- set termguicolors to enable highlight groups
+vim.opt.termguicolors = true
+
 -- if vim.fn.has("wsl") == 1 then
 --     print("WSL")
 -- else
