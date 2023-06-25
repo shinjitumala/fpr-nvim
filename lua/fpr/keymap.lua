@@ -79,6 +79,7 @@ require("nvim-tree").setup({
             return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
         end
         vim.keymap.set("n", "o", api.node.open.edit, opts("Open"))
+        vim.keymap.set("n", "<CR>", api.node.open.edit, opts("Open"))
         vim.keymap.set("n", "<2-LeftMouse>", api.node.open.edit, opts("Open"))
         vim.keymap.set("n", "d", api.fs.remove, opts("Delete"))
 
@@ -93,6 +94,14 @@ require("nvim-tree").setup({
         vim.keymap.set("n", "p", api.fs.paste, opts("Paste"))
         vim.keymap.set("n", "r", api.fs.rename, opts("Rename"))
         vim.keymap.set("n", "?", api.tree.toggle_help, opts("Toggle Help"))
+
+        vim.keymap.set("n", "g", api.tree.toggle_gitignore_filter, opts("Toggle git ignore filter"))
+        vim.keymap.set("n", "h", api.tree.toggle_hidden_filter, opts("Toggle hidden filter"))
+        vim.keymap.set("n", "K", api.node.show_info_popup, opts("Show file info"))
+
+        vim.keymap.set("n", "h", api.node.navigate.parent, opts("Navigate to parent"))
+
+        vim.keymap.set("n", "a", api.fs.create, opts("Create file"))
     end
 })
 
