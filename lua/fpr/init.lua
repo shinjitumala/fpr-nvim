@@ -43,6 +43,35 @@ vim.g.loaded_netrwPlugin = 1
 -- set termguicolors to enable highlight groups
 vim.opt.termguicolors = true
 
+require("catppuccin").setup({
+    color_overrides = {
+        mocha = {
+            base = "#000000",
+            mantle = "#000000",
+            crust = "#000000",
+
+            text = "#dddddd",
+
+            overlay0 = "#4a4a4a",
+            overlay1 = "#939393",
+            overlay2 = "#dddddd",
+
+            surface0 = "#4a4a4a",
+            surface1 = "#4a4a4a",
+            surface2 = "#4a4a4a",
+
+            pink = "#f2abb5",
+            mauve = "#9298ed",
+            green = "#3da94b",
+            teal = "#1d5224",
+            yellow = "#f8e8a0",
+            peach = "#037603",
+        },
+    },
+})
+
+vim.cmd.colorscheme "catppuccin"
+
 -- if vim.fn.has("wsl") == 1 then
 --     print("WSL")
 -- else

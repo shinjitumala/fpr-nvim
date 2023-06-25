@@ -70,6 +70,7 @@ m("t", [[<C-k>l]], "<Cmd>winc l<CR>", {})
 m("t", [[<C-k>h]], "<Cmd>winc h<CR>", {})
 m("t", [[<C-k>k]], "<Cmd>winc k<CR>", {})
 m("t", [[<C-k>j]], "<Cmd>winc j<CR>", {})
+m("t", "<C-k>e", "<Cmd>NvimTreeFocus<CR>", opts)
 
 require("nvim-tree").setup({
     on_attach = function(bufnr)

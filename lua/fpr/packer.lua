@@ -63,4 +63,6 @@ return require('packer').startup(function(use)
             'nvim-tree/nvim-web-devicons', -- optional
         },
     }
+
+    use { "catppuccin/nvim", as = "catppuccin" }
 end)
