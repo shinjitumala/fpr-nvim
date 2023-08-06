@@ -88,6 +88,8 @@ require('packer').startup(function(use)
         -- or                            , branch = '0.1.x',
         requires = { { 'nvim-lua/plenary.nvim' } }
     }
+
+    use { 'airblade/vim-gitgutter' }
 end)
 -->> Load plugins
 
@@ -380,4 +382,3 @@ vim.keymap.set("n", "<C-k>fg", tele.live_grep, opts)
 vim.keymap.set("n", "<C-k>c", '<cmd>let @+ = @%<CR>', opts)
 vim.keymap.set("n", "<C-k>C", '<cmd>let @+ = expand("%:p")<CR>', opts)
 -->> Keymaps
-
