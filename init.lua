@@ -158,8 +158,6 @@ o.clipboard = "unnamedplus"
 o.scrolloff = 8
 o.updatetime = 16
 
-o.clipboard = "unnamed"
-
 o.wrap = true
 
 vim.wo.number = true
