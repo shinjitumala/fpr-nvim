@@ -158,6 +158,8 @@ o.clipboard = "unnamedplus"
 o.scrolloff = 8
 o.updatetime = 16
 
+o.clipboard = "unnamed"
+
 o.wrap = true
 
 vim.wo.number = true
@@ -190,8 +192,8 @@ require("catppuccin").setup({
 
             text = "#dddddd",
 
-            overlay0 = "#4a4a4a",
-            overlay1 = "#939393",
+            overlay0 = "#999999",
+            overlay1 = "#aaaaaa",
             overlay2 = "#dddddd",
 
             surface0 = "#4a4a4a",
@@ -229,17 +231,27 @@ end
 require("nvim-treesitter.configs").setup({
     ensure_installed = {
         "bash",
+        "awk",
         "c",
+        "css",
+        "csv",
         "cpp",
+        "make",
+        "ninja",
+        "sql",
         "typescript",
         "json",
         "lua",
+        "xml",
+        "toml",
+        "latex",
         "markdown_inline",
         "markdown",
         "html",
         "css",
         "yaml",
         "toml",
+        "python",
 
     },
     highlight = {
@@ -358,9 +370,14 @@ require("nvim-tree").setup({
 
 m("n", "<C-k>e", "<Cmd>NvimTreeFocus<CR>", opts)
 m("n", "<A-e>", "<Cmd>NvimTreeToggle<CR>", opts)
+m("n", "<Space>", "<Nop>", opts)
 
 require('Comment').setup({
     toggler = {
+        line = "cc",
+        block = "cb",
+    },
+    opleader = {
         line = "cc",
         block = "cb",
     },
@@ -374,7 +391,16 @@ m("n", "<C-k><S-s>", [[:lua os.execute("source ~/.bashrc; slack_quote")<CR>p]], 
 local tele = require("telescope.builtin")
 
 vim.keymap.set("n", "<C-k>F", tele.find_files, opts)
-vim.keymap.set("n", "<C-k>ff", function() tele.live_grep({ glob_pattern = "*" }) end, opts)
+vim.keymap.set("n", "<C-k>ff", function()
+    tele.live_grep({
+        glob_pattern = { "*", "!.git" },
+    })
+end, opts)
+vim.keymap.set("n", "<C-k>fa", function()
+    tele.live_grep({
+        glob_pattern = { "*.md", "!.git" },
+    })
+end, opts)
 vim.keymap.set("n", "<C-k>fg", tele.live_grep, opts)
 
 vim.keymap.set("n", "<C-k>c", '<cmd>let @+ = @%<CR>', opts)
