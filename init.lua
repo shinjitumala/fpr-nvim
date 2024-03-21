@@ -12,11 +12,6 @@ require('packer').startup(function(use)
     use 'lewis6991/gitsigns.nvim'     -- OPTIONAL: for git status
     use 'romgrk/barbar.nvim'
 
-    -- ToggleTerm
-    use { "akinsho/toggleterm.nvim", tag = '*', config = function()
-        require("toggleterm").setup()
-    end }
-
     -- LSP Zero
     use {
         'VonHeikemen/lsp-zero.nvim',
@@ -60,8 +55,6 @@ require('packer').startup(function(use)
     }
 
     use { 'saadparwaiz1/cmp_luasnip' }
-
-    use 'm4xshen/autoclose.nvim'
 
     use {
         'nvim-tree/nvim-tree.lua',
@@ -162,17 +155,7 @@ o.wrap = true
 
 vim.wo.number = true
 
-require("autoclose").setup({})
-
 require("luasnip.loaders.from_vscode").lazy_load({ paths = env.snippets_dir })
-
-require("toggleterm").setup {
-    hide_numbers = true,
-    winbar = {
-        enabled = false,
-        persist_mode = false,
-    },
-}
 
 -- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
@@ -280,9 +263,6 @@ m("n", "gt", "<Cmd>BufferNext<CR>", opts)
 m("n", "gT", "<Cmd>BufferPrevious<CR>", opts)
 
 m("n", [[<C-k><S-W>]], "<Cmd>BufferCloseAllButCurrent<CR>", opts)
-
-m("n", [[<A-x>]], "<Cmd>ToggleTerm<CR>", opts)
-m("n", [[<C-k>x]], "<Cmd>TermSelect<CR>", opts)
 
 m("n", [[<C-k>l]], "<Cmd>winc l<CR>", opts)
 m("n", [[<C-k>h]], "<Cmd>winc h<CR>", opts)
