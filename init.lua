@@ -244,7 +244,7 @@ require("nvim-treesitter.configs").setup({
 local m = vim.api.nvim_set_keymap
 local opts = { noremap = true, silent = true, }
 
-m("n", "<C-w>", "<Cmd>BufferClose<CR>", opts)
+m("n", "<C-k>w", "<Cmd>BufferClose<CR>", opts)
 m("n", "<C-k>y", "<Cmd>%y+<CR>", opts)
 
 m("n", "<A-1>", "<Cmd>BufferGoto 1<CR>", opts)
