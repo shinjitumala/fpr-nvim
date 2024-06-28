@@ -225,7 +225,6 @@ require("nvim-treesitter.configs").setup({
         "lua",
         "xml",
         "toml",
-        "latex",
         "markdown_inline",
         "markdown",
         "html",
