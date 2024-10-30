@@ -147,6 +147,8 @@ require("lazy").setup({
             "catppuccin/nvim",
             name = "catppuccin",
             opts = function()
+                vim.api.nvim_set_hl(0, "@markup.raw.block.markdown", { link = "Text" })
+                vim.api.nvim_set_hl(0, "@markup.raw.markdown_inline", { link = "Text" })
                 return {
                     color_overrides = {
                         mocha = {
@@ -200,11 +202,8 @@ require("lazy").setup({
         { 'tpope/vim-fugitive' },
         {
             'nvim-treesitter/nvim-treesitter',
-            config = function(_, opts)
-                require("nvim-treesitter").setup(opts)
-                local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
-                ts_update()
-            end,
+            build = ":TSUpdate",
+            main = "nvim-treesitter.configs",
             opts = {
                 ensure_installed = {
                     "bash",
