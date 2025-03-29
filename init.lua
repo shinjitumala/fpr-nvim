@@ -132,7 +132,9 @@ require("lazy").setup({
                     vim.keymap.set("n", "f", function()
                             local n = api.tree.get_node_under_cursor().absolute_path
                             if vim.fn.has("wsl") == 1 then
-                                os.execute("x=\"".. n .."\"; y=$(dirname $x); z=$(basename $x); cd \"$y\" && explorer.exe \"$z\" &> /dev/null")
+                                os.execute("x=\"" ..
+                                n ..
+                                "\"; y=$(dirname \"$x\"); z=$(basename \"$x\"); cd \"$y\" && explorer.exe \"$z\" &> /dev/null")
                             else
                                 os.execute("pcmanfm \"" .. n .. "\" &> /dev/null")
                             end
@@ -335,7 +337,10 @@ m("n", [[<C-k><S-h>]], "<Cmd>winc H<CR>", opts)
 m("n", [[<C-k><S-k>]], "<Cmd>winc K<CR>", opts)
 m("n", [[<C-k><S-j>]], "<Cmd>winc J<CR>", opts)
 
--- local lsp = require("lsp-zero")
+local lsp = require("lspconfig")
+lsp.denols.setup({
+    root_dir = lsp.util.root_pattern("deno.json"),
+})
 
 m("t", [[<C-k>l]], "<Cmd>winc l<CR>", {})
 m("t", [[<C-k>h]], "<Cmd>winc h<CR>", {})
