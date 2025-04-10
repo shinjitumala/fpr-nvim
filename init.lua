@@ -133,8 +133,8 @@ require("lazy").setup({
                             local n = api.tree.get_node_under_cursor().absolute_path
                             if vim.fn.has("wsl") == 1 then
                                 os.execute("x=\"" ..
-                                n ..
-                                "\"; y=$(dirname \"$x\"); z=$(basename \"$x\"); cd \"$y\" && explorer.exe \"$z\" &> /dev/null")
+                                    n ..
+                                    "\"; y=$(dirname \"$x\"); z=$(basename \"$x\"); cd \"$y\" && explorer.exe \"$z\" &> /dev/null")
                             else
                                 os.execute("pcmanfm \"" .. n .. "\" &> /dev/null")
                             end
