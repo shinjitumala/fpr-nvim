@@ -86,6 +86,9 @@ require("lazy").setup({
                         { name = 'luasnip' },
                         { name = 'nvim_lsp' },
                         { name = "buffer",  keyword_length = 3 },
+                        per_filetype = {
+                            codecompanion = { "codecompanion" },
+                        },
                     },
                 }
             end
@@ -202,6 +205,53 @@ require("lazy").setup({
         { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
         { 'airblade/vim-gitgutter' },
         { 'tpope/vim-fugitive' },
+
+        {
+            'saadparwaiz1/cmp_luasnip',
+        },
+
+        -- LLM
+        {
+            "olimorris/codecompanion.nvim",
+            opts = {},
+            dependencies = {
+                "nvim-lua/plenary.nvim",
+                "nvim-treesitter/nvim-treesitter",
+            },
+        },
+        {
+            "OXY2DEV/markview.nvim",
+            lazy = true,
+            opts = {
+                preview = {
+                    filetypes = { "markdown", "codecompanion" },
+                    ignore_buftypes = {},
+                },
+            },
+        },
+        {
+            "echasnovski/mini.diff",
+            config = function()
+                local diff = require("mini.diff")
+                diff.setup({
+                    -- Disabled by default
+                    source = diff.gen_source.none(),
+                })
+            end,
+        },
+        {
+            "HakonHarnes/img-clip.nvim",
+            opts = {
+                filetypes = {
+                    codecompanion = {
+                        prompt_for_file_name = false,
+                        template = "[Image]($FILE_PATH)",
+                        use_absolute_path = true,
+                    },
+                },
+            },
+        },
+        -- Moved for markview
         {
             'nvim-treesitter/nvim-treesitter',
             build = ":TSUpdate",
@@ -235,9 +285,6 @@ require("lazy").setup({
                     enable = true
                 }
             }
-        },
-        {
-            'saadparwaiz1/cmp_luasnip',
         },
     },
 })
@@ -386,3 +433,87 @@ vim.keymap.set("n", "<C-k>fg", tele.live_grep, opts)
 
 vim.keymap.set("n", "<C-k>c", '<cmd>let @+ = @%<CR>', opts)
 vim.keymap.set("n", "<C-k>C", '<cmd>let @+ = expand("%:p")<CR>', opts)
+
+if not hasenv then
+    require("codecompanion").setup({
+        adapters = {
+            llama = function()
+                return require("codecompanion.adapters").extend("openai_compatible", {
+                    env = {
+                        url = "http://fpr1.local:11434",
+                        chat_url = "/v1/chat/completions", -- Standard OpenAI chat endpoint
+                        models_endpoint = "/v1/models",    -- Endpoint to retrieve available models
+                    },
+                    schema = {
+                        model = {
+                            default = "your-model-name", -- Replace with your loaded model name
+                        },
+                        temperature = {
+                            order = 2,
+                            mapping = "parameters",
+                            type = "number",
+                            optional = true,
+                            default = 0.7,
+                            desc = "What sampling temperature to use, between 0 and 2.",
+                            validate = function(n)
+                                return n >= 0 and n <= 2, "Must be between 0 and 2"
+                            end,
+                        },
+                        max_tokens = {
+                            order = 3,
+                            mapping = "parameters",
+                            type = "integer",
+                            optional = true,
+                            default = 2048,
+                            desc = "Maximum number of tokens to generate.",
+                            validate = function(n)
+                                return n > 0, "Must be greater than 0"
+                            end,
+                        },
+                        top_p = {
+                            order = 4,
+                            mapping = "parameters",
+                            type = "number",
+                            optional = true,
+                            default = 0.9,
+                            desc = "Nucleus sampling parameter.",
+                            validate = function(n)
+                                return n >= 0 and n <= 1, "Must be between 0 and 1"
+                            end,
+                        },
+                        repeat_penalty = {
+                            order = 5,
+                            mapping = "parameters",
+                            type = "number",
+                            optional = true,
+                            default = 1.1,
+                            desc = "Penalty for repetition.",
+                            validate = function(n)
+                                return n >= 0, "Must be non-negative"
+                            end,
+                        },
+                        stop = {
+                            order = 6,
+                            mapping = "parameters",
+                            type = "table",
+                            optional = true,
+                            default = nil,
+                            desc = "Stop sequences for generation.",
+                        },
+                    }
+                })
+            end
+        },
+        strategies = {
+            chat = {
+                adapter = "llama",
+            },
+            inline = {
+                adapter = "llama",
+            },
+            cmd = {
+                adapter = "llama",
+            },
+        },
+    })
+end
