@@ -18,56 +18,12 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup lazy.nvim
 require("lazy").setup({
     spec = {
+        { "nvim-telescope/telescope.nvim",              dependencies = { "nvim-lua/plenary.nvim" } },
+        { "nvim-telescope/telescope-file-browser.nvim", dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" } },
+        { "ThePrimeagen/harpoon",                       branch = "harpoon2",                                                        dependencies = { "nvim-lua/plenary.nvim" } },
+
         { "lewis6991/gitsigns.nvim" },
-        { "romgrk/barbar.nvim" },
-
-        {
-            "VonHeikemen/lsp-zero.nvim",
-            branch = "v4.x",
-            config = function()
-                local lsp_attach = function(_, bufnr)
-                    local opts = { buffer = bufnr }
-                    local m = vim.keymap.set
-
-                    m("n", "<C-k>r", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
-                    m("n", "<C-k>m", "<cmd>lua vim.lsp.buf.format()<cr>", opts)
-                    m("n", "<S-K>", "<cmd>lua vim.lsp.buf.hover()<cr>", opts)
-                    m("n", "<C-K>.", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
-
-                    m("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
-                    m("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", opts)
-                    m("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
-                    m("n", "gI", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
-                    m("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", opts)
-                    m("n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", opts)
-                    m("n", "gl", "<cmd>lua vim.diagnostic.open_float()<cr>", opts)
-
-                    m("n", "<C-k>d", "<cmd>lua vim.diagnostic.goto_next()<cr>", opts)
-                    m("n", "<C-k>D", "<cmd>lua vim.diagnostic.goto_prev()<cr>", opts)
-                end
-                require("lsp-zero").extend_lspconfig({
-                    capabilities = require("cmp_nvim_lsp").default_capabilities(),
-                    lsp_attach = lsp_attach,
-                })
-            end
-        },
         { "neovim/nvim-lspconfig" },
-        { "williamboman/mason.nvim", opts = {} },
-        {
-            "williamboman/mason-lspconfig.nvim",
-            dependencies = { "VonHeikemen/lsp-zero.nvim" },
-            opts = function()
-                return {
-                    ensure_installed = {
-                    },
-                    handlers = {
-                        function(server_name)
-                            require("lspconfig")[server_name].setup({})
-                        end
-                    }
-                }
-            end
-        },
         {
             "hrsh7th/nvim-cmp",
             opts = function()
@@ -86,67 +42,12 @@ require("lazy").setup({
                         { name = 'luasnip' },
                         { name = 'nvim_lsp' },
                         { name = "buffer",  keyword_length = 3 },
-                        per_filetype = {
-                            codecompanion = { "codecompanion" },
-                        },
                     },
                 }
             end
         },
         { "hrsh7th/cmp-nvim-lsp" },
         { "L3MON4D3/LuaSnip" },
-
-        {
-            'nvim-tree/nvim-tree.lua',
-            dependencies = {
-                'nvim-tree/nvim-web-devicons',
-            },
-            opts = {
-                on_attach = function(bufnr)
-                    local api = require("nvim-tree.api")
-                    local function opts(desc)
-                        return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
-                    end
-                    vim.keymap.set("n", "o", api.node.open.edit, opts("Open"))
-                    vim.keymap.set("n", "<CR>", api.node.open.edit, opts("Open"))
-                    vim.keymap.set("n", "<2-LeftMouse>", api.node.open.edit, opts("Open"))
-                    vim.keymap.set("n", "d", api.fs.remove, opts("Delete"))
-
-                    vim.keymap.set("n", "R", api.tree.reload, opts("Reload"))
-
-                    vim.keymap.set("n", "/", api.tree.search_node, opts("Search"))
-
-                    vim.keymap.set("n", "c", api.fs.copy.relative_path, opts("Copy relative path"))
-                    vim.keymap.set("n", "C", api.fs.copy.absolute_path, opts("Copy absoulte path"))
-
-                    vim.keymap.set("n", "y", api.fs.copy.node, opts("Copy"))
-                    vim.keymap.set("n", "p", api.fs.paste, opts("Paste"))
-                    vim.keymap.set("n", "r", api.fs.rename, opts("Rename"))
-                    vim.keymap.set("n", "?", api.tree.toggle_help, opts("Toggle Help"))
-
-                    vim.keymap.set("n", "gf", api.tree.toggle_gitignore_filter, opts("Toggle git ignore filter"))
-                    vim.keymap.set("n", "h", api.tree.toggle_hidden_filter, opts("Toggle hidden filter"))
-                    vim.keymap.set("n", "K", api.node.show_info_popup, opts("Show file info"))
-
-                    vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Navigate to parent"))
-
-                    vim.keymap.set("n", "a", api.fs.create, opts("Create file"))
-
-                    vim.keymap.set("n", "f", function()
-                            local n = api.tree.get_node_under_cursor().absolute_path
-                            if vim.fn.has("wsl") == 1 then
-                                os.execute("x=\"" ..
-                                    n ..
-                                    "\"; y=$(dirname \"$x\"); z=$(basename \"$x\"); cd \"$y\" && explorer.exe \"$z\" &> /dev/null")
-                            else
-                                os.execute("pcmanfm \"" .. n .. "\" &> /dev/null")
-                            end
-                        end,
-                        opts("Open in windows file explorer"))
-                end
-            }
-        },
-        { "nvim-tree/nvim-web-devicons",   opts = {} },
 
         {
             "catppuccin/nvim",
@@ -202,56 +103,7 @@ require("lazy").setup({
                 },
             }
         },
-        { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
         { 'airblade/vim-gitgutter' },
-        { 'tpope/vim-fugitive' },
-
-        {
-            'saadparwaiz1/cmp_luasnip',
-        },
-
-        -- LLM
-        {
-            "olimorris/codecompanion.nvim",
-            opts = {},
-            dependencies = {
-                "nvim-lua/plenary.nvim",
-                "nvim-treesitter/nvim-treesitter",
-            },
-        },
-        {
-            "OXY2DEV/markview.nvim",
-            lazy = true,
-            opts = {
-                preview = {
-                    filetypes = { "markdown", "codecompanion" },
-                    ignore_buftypes = {},
-                },
-            },
-        },
-        {
-            "echasnovski/mini.diff",
-            config = function()
-                local diff = require("mini.diff")
-                diff.setup({
-                    -- Disabled by default
-                    source = diff.gen_source.none(),
-                })
-            end,
-        },
-        {
-            "HakonHarnes/img-clip.nvim",
-            opts = {
-                filetypes = {
-                    codecompanion = {
-                        prompt_for_file_name = false,
-                        template = "[Image]($FILE_PATH)",
-                        use_absolute_path = true,
-                    },
-                },
-            },
-        },
-        -- Moved for markview
         {
             'nvim-treesitter/nvim-treesitter',
             build = ":TSUpdate",
@@ -286,11 +138,11 @@ require("lazy").setup({
                 }
             }
         },
+        {
+            'saadparwaiz1/cmp_luasnip',
+        },
     },
 })
-
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
 
 local o = vim.opt
 local tw = 4
@@ -393,26 +245,47 @@ m("t", [[<C-k>l]], "<Cmd>winc l<CR>", {})
 m("t", [[<C-k>h]], "<Cmd>winc h<CR>", {})
 m("t", [[<C-k>k]], "<Cmd>winc k<CR>", {})
 m("t", [[<C-k>j]], "<Cmd>winc j<CR>", {})
-m("t", "<C-k>e", "<Cmd>NvimTreeFocus<CR>", opts)
-
-m("t", "<C-k>1", "<Cmd>NvimTreeFocus<CR><Cmd>BufferGoto 1<CR>", opts)
-m("t", "<C-k>2", "<Cmd>NvimTreeFocus<CR><Cmd>BufferGoto 2<CR>", opts)
-m("t", "<C-k>3", "<Cmd>NvimTreeFocus<CR><Cmd>BufferGoto 3<CR>", opts)
-m("t", "<C-k>4", "<Cmd>NvimTreeFocus<CR><Cmd>BufferGoto 4<CR>", opts)
-m("t", "<C-k>5", "<Cmd>NvimTreeFocus<CR><Cmd>BufferGoto 5<CR>", opts)
-m("t", "<C-k>6", "<Cmd>NvimTreeFocus<CR><Cmd>BufferGoto 6<CR>", opts)
-m("t", "<C-k>7", "<Cmd>NvimTreeFocus<CR><Cmd>BufferGoto 7<CR>", opts)
-m("t", "<C-k>8", "<Cmd>NvimTreeFocus<CR><Cmd>BufferGoto 8<CR>", opts)
-m("t", "<C-k>9", "<Cmd>NvimTreeFocus<CR><Cmd>BufferGoto 9<CR>", opts)
-
-m("t", "<C-k>g", "<Cmd>NvimTreeFocus<CR><Cmd>Gedit :<CR>", opts)
-
 
 m("n", "gq", "<cmd>nohl<cr>", opts)
 
-m("n", "<C-k>e", "<Cmd>NvimTreeFocus<CR>", opts)
-m("n", "<A-e>", "<Cmd>NvimTreeToggle<CR>", opts)
 m("n", "<Space>", "<Nop>", opts)
+
+m("n", "<C-k>r", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
+m("n", "<C-k>m", "<cmd>lua vim.lsp.buf.format()<cr>", opts)
+m("n", "<S-K>", "<cmd>lua vim.lsp.buf.hover()<cr>", opts)
+m("n", "<C-K>.", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
+
+m("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
+m("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", opts)
+m("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
+m("n", "gI", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
+m("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", opts)
+m("n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", opts)
+m("n", "gl", "<cmd>lua vim.diagnostic.open_float()<cr>", opts)
+
+m("n", "<C-k>d", "<cmd>lua vim.diagnostic.goto_next()<cr>", opts)
+m("n", "<C-k>D", "<cmd>lua vim.diagnostic.goto_prev()<cr>", opts)
+
+m("n", "<C-k>fe", "<cmd>:Telescope file_browser<cr>", opts)
+-- m("n", "<C-k>fd", "<cmd>:Telescope find_files --hidden<cr>", opts)
+
+vim.lsp.enable("lua_ls")
+
+require("telescope").setup {
+    extensions = {
+        file_browser = {
+            hijack_netrw = true,
+            follow_symlinks = true,
+            no_ignore = true,
+            mappings = {
+                ["n"] = {
+                    ["f"] = 
+                }
+            }
+        }
+    }
+}
+require("telescope").load_extension "file_browser"
 
 local tele = require("telescope.builtin")
 
@@ -430,90 +303,21 @@ vim.keymap.set("n", "<C-k>fa", function()
     })
 end, opts)
 vim.keymap.set("n", "<C-k>fg", tele.live_grep, opts)
+vim.keymap.set("n", "<C-k>fd", function()
+    tele.find_files({
+        hidden = true,
+        follow = true,
+    })
+end, opts)
 
 vim.keymap.set("n", "<C-k>c", '<cmd>let @+ = @%<CR>', opts)
 vim.keymap.set("n", "<C-k>C", '<cmd>let @+ = expand("%:p")<CR>', opts)
 
-if not hasenv then
-    require("codecompanion").setup({
-        adapters = {
-            llama = function()
-                return require("codecompanion.adapters").extend("openai_compatible", {
-                    env = {
-                        url = "http://fpr1.local:11434",
-                        chat_url = "/v1/chat/completions", -- Standard OpenAI chat endpoint
-                        models_endpoint = "/v1/models",    -- Endpoint to retrieve available models
-                    },
-                    schema = {
-                        model = {
-                            default = "your-model-name", -- Replace with your loaded model name
-                        },
-                        temperature = {
-                            order = 2,
-                            mapping = "parameters",
-                            type = "number",
-                            optional = true,
-                            default = 0.7,
-                            desc = "What sampling temperature to use, between 0 and 2.",
-                            validate = function(n)
-                                return n >= 0 and n <= 2, "Must be between 0 and 2"
-                            end,
-                        },
-                        max_tokens = {
-                            order = 3,
-                            mapping = "parameters",
-                            type = "integer",
-                            optional = true,
-                            default = 2048,
-                            desc = "Maximum number of tokens to generate.",
-                            validate = function(n)
-                                return n > 0, "Must be greater than 0"
-                            end,
-                        },
-                        top_p = {
-                            order = 4,
-                            mapping = "parameters",
-                            type = "number",
-                            optional = true,
-                            default = 0.9,
-                            desc = "Nucleus sampling parameter.",
-                            validate = function(n)
-                                return n >= 0 and n <= 1, "Must be between 0 and 1"
-                            end,
-                        },
-                        repeat_penalty = {
-                            order = 5,
-                            mapping = "parameters",
-                            type = "number",
-                            optional = true,
-                            default = 1.1,
-                            desc = "Penalty for repetition.",
-                            validate = function(n)
-                                return n >= 0, "Must be non-negative"
-                            end,
-                        },
-                        stop = {
-                            order = 6,
-                            mapping = "parameters",
-                            type = "table",
-                            optional = true,
-                            default = nil,
-                            desc = "Stop sequences for generation.",
-                        },
-                    }
-                })
-            end
-        },
-        strategies = {
-            chat = {
-                adapter = "llama",
-            },
-            inline = {
-                adapter = "llama",
-            },
-            cmd = {
-                adapter = "llama",
-            },
-        },
-    })
-end
+
+local harpoon = require("harpoon")
+
+-- REQUIRED
+harpoon:setup()
+-- REQUIRED
+vim.keymap.set("n", "<C-k>a", function() harpoon:list():add() end)
+vim.keymap.set("n", "<C-k>e", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
