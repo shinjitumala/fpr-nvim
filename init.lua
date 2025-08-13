@@ -279,7 +279,6 @@ require("telescope").setup {
             no_ignore = true,
             mappings = {
                 ["n"] = {
-                    ["f"] = 
                 }
             }
         }
