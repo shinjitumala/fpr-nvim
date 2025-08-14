@@ -254,6 +254,19 @@ local action_state = require "telescope.actions.state"
 local actions = require "telescope.actions"
 local fb_utils = require "telescope._extensions.file_browser.utils"
 
+local function copy(x)
+    require("plenary.job")
+        :new({
+            command = "sh",
+            args = {
+                "-c",
+                'salt copy <<<"$0"',
+                x,
+            },
+        })
+        :start()
+end
+
 local function open(p)
     local quiet = action_state.get_current_picker(p).finder.quiet
     local selections = fb_utils.get_selected_files(p, true)
@@ -296,16 +309,7 @@ local function toclip(p)
     end
 
     for _, selection in ipairs(selections) do
-    require("plenary.job")
-        :new({
-            command = "sh",
-            args = {
-                "-c",
-                'salt copy <<<"$0"',
-                selection:make_relative(vim.fn.getcwd()),
-            },
-        })
-        :start()
+        copy(selection:make_relative(vim.fn.getcwd()))
     end
 end
 local function toclip_absl(p)
@@ -319,20 +323,15 @@ local function toclip_absl(p)
     end
 
     for _, selection in ipairs(selections) do
-    require("plenary.job")
-        :new({
-            command = "sh",
-            args = {
-                "-c",
-                'salt copy <<<"$0"',
-                selection:absolute(),
-            },
-        })
-        :start()
+        copy(selection:absolute())
     end
 end
--- 
+--
 local function toclip_w(p)
+    if vim.fn.has("wsl") ~= 1 then
+        return
+    end
+
     local quiet = action_state.get_current_picker(p).finder.quiet
     local selections = fb_utils.get_selected_files(p, true)
 
@@ -343,16 +342,19 @@ local function toclip_w(p)
     end
 
     for _, selection in ipairs(selections) do
-    require("plenary.job")
-        :new({
-            command = "sh",
-            args = {
+        local r = vim.system(
+            {
+                "sh",
                 "-c",
-                'y=$(dirname "$0"); z=$(basename "$0"); cd "$y" && w=$(powershell.exe \\(Resolve-Path -LiteralPath "$z"\\).ProviderPath)&& salt copy <<<"$w"',
-                selection:make_relative(vim.fn.getcwd()),
+                'y=$(dirname "$0"); z=$(basename "$0"); cd "$y" && powershell.exe \\(Resolve-Path -LiteralPath "$z"\\).ProviderPath',
+                selection:absolute(),
             },
-        })
-        :start()
+            { text = true }):wait();
+        if r.code ~= 0 then
+            vim.api.nvim_echo({ "Path command failed because " .. r.stdout, "ErrorMsg" })
+            return
+        end
+        copy(r.stdout)
     end
 end
 
