@@ -18,10 +18,19 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup lazy.nvim
 require("lazy").setup({
     spec = {
-        { "nvim-telescope/telescope.nvim",              dependencies = { "nvim-lua/plenary.nvim" } },
-        { "nvim-telescope/telescope-file-browser.nvim", dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" } },
-        { "ThePrimeagen/harpoon",                       branch = "harpoon2",                                                        dependencies = { "nvim-lua/plenary.nvim" } },
-
+        {
+            "nvim-telescope/telescope.nvim",
+            dependencies = { "nvim-lua/plenary.nvim" }
+        },
+        {
+            "nvim-telescope/telescope-file-browser.nvim",
+            dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+        },
+        {
+            "ThePrimeagen/harpoon",
+            branch = "harpoon2",
+            dependencies = { "nvim-lua/plenary.nvim" }
+        },
         { "lewis6991/gitsigns.nvim" },
         { "neovim/nvim-lspconfig" },
         {
@@ -190,42 +199,12 @@ if vim.fn.has("wsl") == 1 then
         },
         cache_enabled = 1,
     }
-else
 end
 
 -- Keymaps
 local m = vim.api.nvim_set_keymap
+local mf = vim.keymap.set
 local opts = { noremap = true, silent = true, }
-
-m("n", "<C-k>w", "<Cmd>BufferClose<CR>", opts)
-m("n", "<C-k>y", "<Cmd>%y+<CR>", opts)
-
-m("n", "<A-1>", "<Cmd>BufferGoto 1<CR>", opts)
-m("n", "<A-2>", "<Cmd>BufferGoto 2<CR>", opts)
-m("n", "<A-3>", "<Cmd>BufferGoto 3<CR>", opts)
-m("n", "<A-4>", "<Cmd>BufferGoto 4<CR>", opts)
-m("n", "<A-5>", "<Cmd>BufferGoto 5<CR>", opts)
-m("n", "<A-6>", "<Cmd>BufferGoto 6<CR>", opts)
-m("n", "<A-7>", "<Cmd>BufferGoto 7<CR>", opts)
-m("n", "<A-8>", "<Cmd>BufferGoto 8<CR>", opts)
-m("n", "<A-9>", "<Cmd>BufferGoto 9<CR>", opts)
-
-m("n", "<C-k>1", "<Cmd>BufferGoto 1<CR>", opts)
-m("n", "<C-k>2", "<Cmd>BufferGoto 2<CR>", opts)
-m("n", "<C-k>3", "<Cmd>BufferGoto 3<CR>", opts)
-m("n", "<C-k>4", "<Cmd>BufferGoto 4<CR>", opts)
-m("n", "<C-k>5", "<Cmd>BufferGoto 5<CR>", opts)
-m("n", "<C-k>6", "<Cmd>BufferGoto 6<CR>", opts)
-m("n", "<C-k>7", "<Cmd>BufferGoto 7<CR>", opts)
-m("n", "<C-k>8", "<Cmd>BufferGoto 8<CR>", opts)
-m("n", "<C-k>9", "<Cmd>BufferGoto 9<CR>", opts)
-
-m("n", "<C-k>g", "<Cmd>Gedit :<CR>", opts)
-
-m("n", "gt", "<Cmd>BufferNext<CR>", opts)
-m("n", "gT", "<Cmd>BufferPrevious<CR>", opts)
-
-m("n", [[<C-k><S-W>]], "<Cmd>BufferCloseAllButCurrent<CR>", opts)
 
 m("n", [[<C-k>l]], "<Cmd>winc l<CR>", opts)
 m("n", [[<C-k>h]], "<Cmd>winc h<CR>", opts)
@@ -250,26 +229,62 @@ m("n", "gq", "<cmd>nohl<cr>", opts)
 
 m("n", "<Space>", "<Nop>", opts)
 
-m("n", "<C-k>r", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
-m("n", "<C-k>m", "<cmd>lua vim.lsp.buf.format()<cr>", opts)
-m("n", "<S-K>", "<cmd>lua vim.lsp.buf.hover()<cr>", opts)
-m("n", "<C-K>.", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
+mf("n", "<C-k>r", function() vim.lsp.buf.rename() end, opts)
+mf("n", "<C-k>m", function() vim.lsp.buf.format() end, opts)
+mf("n", "<S-K>", function() vim.lsp.buf.hover() end, opts)
+mf("n", "<C-K>.", function() vim.lsp.buf.code_action() end, opts)
 
-m("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
-m("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", opts)
-m("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
-m("n", "gI", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
-m("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", opts)
-m("n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", opts)
-m("n", "gl", "<cmd>lua vim.diagnostic.open_float()<cr>", opts)
+mf("n", "gd", function() vim.lsp.buf.definition() end, opts)
+mf("n", "gD", function() vim.lsp.buf.declaration() end, opts)
+mf("n", "gi", function() vim.lsp.buf.implementation() end, opts)
+mf("n", "gI", function() vim.lsp.buf.type_definition() end, opts)
+mf("n", "gr", function() vim.lsp.buf.references() end, opts)
+mf("n", "gs", function() vim.lsp.buf.signature_help() end, opts)
+mf("n", "gl", function() vim.diagnostic.open_float() end, opts)
 
-m("n", "<C-k>d", "<cmd>lua vim.diagnostic.goto_next()<cr>", opts)
-m("n", "<C-k>D", "<cmd>lua vim.diagnostic.goto_prev()<cr>", opts)
+mf("n", "<C-k>d", function() vim.diagnostic.goto_next() end, opts)
+mf("n", "<C-k>D", function() vim.diagnostic.goto_prev() end, opts)
 
-m("n", "<C-k>fe", "<cmd>:Telescope file_browser<cr>", opts)
+m("n", "<A-e>", "<cmd>:Telescope file_browser<cr>", opts)
 -- m("n", "<C-k>fd", "<cmd>:Telescope find_files --hidden<cr>", opts)
 
 vim.lsp.enable("lua_ls")
+
+local action_state = require "telescope.actions.state"
+local actions = require "telescope.actions"
+local fb_utils = require "telescope._extensions.file_browser.utils"
+
+function open(p)
+    local quiet = action_state.get_current_picker(p).finder.quiet
+    local selections = fb_utils.get_selected_files(p, true)
+    if vim.tbl_isempty(selections) then
+        fb_utils.notify("actions.open",
+            { msg = "No selection to be opened!", level = "INFO", quiet = quiet })
+        return
+    end
+
+    for _, selection in ipairs(selections) do
+        if vim.fn.has("wsl") == 1 then
+            require("plenary.job")
+                :new({
+                    command = "sh",
+                    args = {
+                        "-c",
+                        'y=$(dirname "$0"); z=$(basename "$0"); cd "$y" && explorer.exe "$z"',
+                        selection:absolute(),
+                    },
+                })
+                :start()
+        else
+            require("plenary.job")
+                :new({
+                    command = "pcmanfm",
+                    args = { selection:absolute() },
+                })
+                :start()
+        end
+    end
+end
 
 require("telescope").setup {
     extensions = {
@@ -279,7 +294,11 @@ require("telescope").setup {
             no_ignore = true,
             mappings = {
                 ["n"] = {
-                }
+                    ["f"] = open,
+                },
+                ["i"] = {
+                    ["<A-f>"] = open,
+                },
             }
         }
     }
@@ -290,33 +309,45 @@ local tele = require("telescope.builtin")
 
 m("n", "<C-k><S-s>", [[:lua os.execute("source ~/.bashrc; slack_quote")<CR>p]], opts)
 
-vim.keymap.set("n", "<C-k>F", tele.find_files, opts)
-vim.keymap.set("n", "<C-k>ff", function()
+mf("n", "<C-k>F", tele.find_files, opts)
+mf("n", "<C-k>ff", function()
     tele.live_grep({
         glob_pattern = { "*", "!.git" },
     })
 end, opts)
-vim.keymap.set("n", "<C-k>fa", function()
+mf("n", "<C-k>fa", function()
     tele.live_grep({
         glob_pattern = { "*.md", "!.git" },
     })
 end, opts)
-vim.keymap.set("n", "<C-k>fg", tele.live_grep, opts)
-vim.keymap.set("n", "<C-k>fd", function()
+mf("n", "<C-k>fg", tele.live_grep, opts)
+mf("n", "<C-k>fd", function()
     tele.find_files({
         hidden = true,
         follow = true,
     })
 end, opts)
 
-vim.keymap.set("n", "<C-k>c", '<cmd>let @+ = @%<CR>', opts)
-vim.keymap.set("n", "<C-k>C", '<cmd>let @+ = expand("%:p")<CR>', opts)
+mf("n", "<C-k>c", '<cmd>let @+ = @%<CR>', opts)
+mf("n", "<C-k>C", '<cmd>let @+ = expand("%:p")<CR>', opts)
 
 
+-- harpoon {
 local harpoon = require("harpoon")
-
--- REQUIRED
 harpoon:setup()
--- REQUIRED
-vim.keymap.set("n", "<C-k>a", function() harpoon:list():add() end)
-vim.keymap.set("n", "<C-k>e", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+mf("n", "<A-a>", function() harpoon:list():add() end)
+mf("n", "<A-w>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+
+mf("n", "<A-1>", function() harpoon:list():select(1) end)
+mf("n", "<A-2>", function() harpoon:list():select(2) end)
+mf("n", "<A-3>", function() harpoon:list():select(3) end)
+mf("n", "<A-4>", function() harpoon:list():select(4) end)
+mf("n", "<A-5>", function() harpoon:list():select(5) end)
+mf("n", "<A-6>", function() harpoon:list():select(6) end)
+mf("n", "<A-7>", function() harpoon:list():select(7) end)
+mf("n", "<A-8>", function() harpoon:list():select(8) end)
+mf("n", "<A-9>", function() harpoon:list():select(9) end)
+
+mf("n", "gt", function() harpoon:list():next() end)
+mf("n", "gT", function() harpoon:list():prev() end)
+-- }
