@@ -254,7 +254,7 @@ local action_state = require "telescope.actions.state"
 local actions = require "telescope.actions"
 local fb_utils = require "telescope._extensions.file_browser.utils"
 
-function open(p)
+local function open(p)
     local quiet = action_state.get_current_picker(p).finder.quiet
     local selections = fb_utils.get_selected_files(p, true)
     if vim.tbl_isempty(selections) then
@@ -285,6 +285,76 @@ function open(p)
         end
     end
 end
+local function toclip(p)
+    local quiet = action_state.get_current_picker(p).finder.quiet
+    local selections = fb_utils.get_selected_files(p, true)
+
+    if vim.tbl_isempty(selections) then
+        fb_utils.notify("actions.open",
+            { msg = "No selection to be opened!", level = "INFO", quiet = quiet })
+        return
+    end
+
+    for _, selection in ipairs(selections) do
+    require("plenary.job")
+        :new({
+            command = "sh",
+            args = {
+                "-c",
+                'salt copy <<<"$0"',
+                selection:make_relative(vim.fn.getcwd()),
+            },
+        })
+        :start()
+    end
+end
+local function toclip_absl(p)
+    local quiet = action_state.get_current_picker(p).finder.quiet
+    local selections = fb_utils.get_selected_files(p, true)
+
+    if vim.tbl_isempty(selections) then
+        fb_utils.notify("actions.open",
+            { msg = "No selection to be opened!", level = "INFO", quiet = quiet })
+        return
+    end
+
+    for _, selection in ipairs(selections) do
+    require("plenary.job")
+        :new({
+            command = "sh",
+            args = {
+                "-c",
+                'salt copy <<<"$0"',
+                selection:absolute(),
+            },
+        })
+        :start()
+    end
+end
+-- 
+local function toclip_w(p)
+    local quiet = action_state.get_current_picker(p).finder.quiet
+    local selections = fb_utils.get_selected_files(p, true)
+
+    if vim.tbl_isempty(selections) then
+        fb_utils.notify("actions.open",
+            { msg = "No selection to be opened!", level = "INFO", quiet = quiet })
+        return
+    end
+
+    for _, selection in ipairs(selections) do
+    require("plenary.job")
+        :new({
+            command = "sh",
+            args = {
+                "-c",
+                'y=$(dirname "$0"); z=$(basename "$0"); cd "$y" && w=$(powershell.exe \\(Resolve-Path -LiteralPath "$z"\\).ProviderPath)&& salt copy <<<"$w"',
+                selection:make_relative(vim.fn.getcwd()),
+            },
+        })
+        :start()
+    end
+end
 
 require("telescope").setup {
     extensions = {
@@ -295,6 +365,9 @@ require("telescope").setup {
             mappings = {
                 ["n"] = {
                     ["f"] = open,
+                    ["c"] = toclip,
+                    ["C"] = toclip_absl,
+                    ["w"] = toclip_w,
                 },
                 ["i"] = {
                     ["<A-f>"] = open,
