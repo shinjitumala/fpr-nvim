@@ -261,9 +261,15 @@ local function copy(x)
             command = "sh",
             args = {
                 "-c",
-                'salt copy <<<"$0"',
+                '~/.cargo/bin/salt copy <<<"$0"',
                 x,
             },
+            on_exit = function(j, return_val)
+                if return_val ~= 0 then
+                    print("Copy command failed with return code:", return_val)
+                    print("stderr:", table.concat(j:stderr_result(), "\n"))
+                end
+            end,
         })
         :start()
 end
@@ -362,7 +368,22 @@ local function copy_windows_path(p)
     end
 end
 
+local fb_actions = require "telescope._extensions.file_browser.actions"
 require("telescope").setup {
+    defaults = {
+        mappings = {
+            i = {
+                ["<C-u>"] = false,
+                ["<Esc>"] = actions.close,
+                ["<C-c>"] = false,
+                ["<A-j>"] = actions.move_selection_next,
+                ["<A-k>"] = actions.move_selection_previous,
+            },
+            n = {
+                ["<C-c>"] = actions.close,
+            },
+        },
+    },
     extensions = {
         file_browser = {
             hijack_netrw = true,
@@ -374,9 +395,13 @@ require("telescope").setup {
                     ["c"] = copy_relative_path,
                     ["C"] = copy_absolute_path,
                     ["w"] = copy_windows_path,
+                    ["n"] = fb_actions.create,
                 },
                 ["i"] = {
                     ["<A-f>"] = open,
+                    ["<A-c>"] = copy_relative_path,
+                    ["<A-C>"] = copy_absolute_path,
+                    ["<A-w>"] = copy_windows_path,
                 },
             }
         }
