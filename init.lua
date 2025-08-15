@@ -249,6 +249,7 @@ m("n", "<A-e>", "<cmd>:Telescope file_browser<cr>", opts)
 -- m("n", "<C-k>fd", "<cmd>:Telescope find_files --hidden<cr>", opts)
 
 vim.lsp.enable("lua_ls")
+vim.lsp.enable("rust_analyzer")
 
 local action_state = require "telescope.actions.state"
 local actions = require "telescope.actions"
@@ -298,7 +299,7 @@ local function open(p)
         end
     end
 end
-local function toclip(p)
+local function copy_relative_path(p)
     local quiet = action_state.get_current_picker(p).finder.quiet
     local selections = fb_utils.get_selected_files(p, true)
 
@@ -309,10 +310,11 @@ local function toclip(p)
     end
 
     for _, selection in ipairs(selections) do
-        copy(selection:make_relative(vim.fn.getcwd()))
+        local x = selection:make_relative(vim.fn.getcwd());
+        copy(x)
     end
 end
-local function toclip_absl(p)
+local function copy_absolute_path(p)
     local quiet = action_state.get_current_picker(p).finder.quiet
     local selections = fb_utils.get_selected_files(p, true)
 
@@ -323,11 +325,12 @@ local function toclip_absl(p)
     end
 
     for _, selection in ipairs(selections) do
-        copy(selection:absolute())
+        local x = selection:absolute()
+        copy(x)
     end
 end
 --
-local function toclip_w(p)
+local function copy_windows_path(p)
     if vim.fn.has("wsl") ~= 1 then
         return
     end
@@ -354,7 +357,8 @@ local function toclip_w(p)
             vim.api.nvim_echo({ "Path command failed because " .. r.stdout, "ErrorMsg" })
             return
         end
-        copy(r.stdout)
+        local x = r.stdout
+        copy(x)
     end
 end
 
@@ -367,9 +371,9 @@ require("telescope").setup {
             mappings = {
                 ["n"] = {
                     ["f"] = open,
-                    ["c"] = toclip,
-                    ["C"] = toclip_absl,
-                    ["w"] = toclip_w,
+                    ["c"] = copy_relative_path,
+                    ["C"] = copy_absolute_path,
+                    ["w"] = copy_windows_path,
                 },
                 ["i"] = {
                     ["<A-f>"] = open,
