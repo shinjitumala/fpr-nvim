@@ -396,6 +396,7 @@ require("telescope").setup {
                     ["C"] = copy_absolute_path,
                     ["w"] = copy_windows_path,
                     ["n"] = fb_actions.create,
+                    ["o"] = false,
                 },
                 ["i"] = {
                     ["<A-f>"] = open,
