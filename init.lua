@@ -251,6 +251,7 @@ m("n", "<A-e>", "<cmd>:Telescope file_browser<cr>", opts)
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("rust_analyzer")
 vim.lsp.enable("taplo")
+vim.lsp.enable("bashls")
 
 local action_state = require "telescope.actions.state"
 local actions = require "telescope.actions"
