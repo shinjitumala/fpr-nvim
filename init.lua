@@ -215,11 +215,6 @@ m("n", [[<C-k><S-h>]], "<Cmd>winc H<CR>", opts)
 m("n", [[<C-k><S-k>]], "<Cmd>winc K<CR>", opts)
 m("n", [[<C-k><S-j>]], "<Cmd>winc J<CR>", opts)
 
-local lsp = require("lspconfig")
-lsp.denols.setup({
-    root_dir = lsp.util.root_pattern("deno.json"),
-})
-
 m("t", [[<C-k>l]], "<Cmd>winc l<CR>", {})
 m("t", [[<C-k>h]], "<Cmd>winc h<CR>", {})
 m("t", [[<C-k>k]], "<Cmd>winc k<CR>", {})
@@ -252,6 +247,11 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("rust_analyzer")
 vim.lsp.enable("taplo")
 vim.lsp.enable("bashls")
+vim.lsp.enable("ts_ls")
+vim.lsp.enable("denols")
+vim.lsp.enable("html")
+vim.lsp.enable("css_ls")
+vim.lsp.enable("json")
 
 local action_state = require "telescope.actions.state"
 local actions = require "telescope.actions"
