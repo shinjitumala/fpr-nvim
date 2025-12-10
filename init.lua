@@ -247,7 +247,13 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("rust_analyzer")
 vim.lsp.enable("taplo")
 vim.lsp.enable("bashls")
+vim.lsp.config["ts_ls"] = {
+    root_markers = { "tsconfig.json" }
+}
 vim.lsp.enable("ts_ls")
+vim.lsp.config["denols"] = {
+    root_markers = { "deno.json" }
+}
 vim.lsp.enable("denols")
 vim.lsp.enable("html")
 vim.lsp.enable("css_ls")
