@@ -247,14 +247,27 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("rust_analyzer")
 vim.lsp.enable("taplo")
 vim.lsp.enable("bashls")
-vim.lsp.config["ts_ls"] = {
-    root_markers = { "tsconfig.json" }
-}
 vim.lsp.enable("ts_ls")
-vim.lsp.config["denols"] = {
-    root_markers = { "deno.json" }
+vim.lsp.config["ts_ls"] = {
+    root_dir = function(_, callback)
+		local deno_dir = vim.fs.root(0, { "deno.json", "deno.jsonc" })
+		local root_dir = vim.fs.root(0, { "tsconfig.json", "jsconfig.json", "package.json" })
+
+		if root_dir and deno_dir == nil then
+			callback(root_dir)
+		end
+    end
 }
 vim.lsp.enable("denols")
+vim.lsp.config["denols"] = {
+    root_dir = function(_, callback)
+        local root_dir = vim.fs.root(0, { "deno.json", "deno.jsonc" })
+
+        if root_dir then
+            callback(root_dir)
+        end
+    end
+}
 vim.lsp.enable("html")
 vim.lsp.enable("css_ls")
 vim.lsp.enable("json")
