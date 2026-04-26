@@ -61,39 +61,6 @@ require("lazy").setup({
         {
             "catppuccin/nvim",
             name = "catppuccin",
-            opts = function()
-                vim.api.nvim_set_hl(0, "@markup.raw.block.markdown", { link = "Text" })
-                vim.api.nvim_set_hl(0, "@markup.raw.markdown_inline", { link = "Text" })
-                return {
-                    color_overrides = {
-                        mocha = {
-                            base = "#000000",
-                            mantle = "#000000",
-                            crust = "#000000",
-
-                            text = "#dddddd",
-
-                            overlay0 = "#999999",
-                            overlay1 = "#aaaaaa",
-                            overlay2 = "#dddddd",
-
-                            surface0 = "#4a4a4a",
-                            surface1 = "#4a4a4a",
-                            surface2 = "#4a4a4a",
-
-                            pink = "#f2abb5",
-                            mauve = "#9298ed",
-                            green = "#3da94b",
-                            teal = "#1d5224",
-                            yellow = "#f8e8a0",
-                            peach = "#037603",
-                        },
-                    },
-                }
-            end,
-            init = function()
-                vim.cmd.colorscheme "catppuccin"
-            end
         },
 
         {
@@ -152,6 +119,36 @@ require("lazy").setup({
         },
     },
 })
+
+require("catppuccin").setup({
+    color_overrides = {
+        mocha = {
+            base = "#000000",
+            mantle = "#000000",
+            crust = "#000000",
+
+            text = "#dddddd",
+
+            overlay0 = "#999999",
+            overlay1 = "#aaaaaa",
+            overlay2 = "#dddddd",
+
+            surface0 = "#4a4a4a",
+            surface1 = "#4a4a4a",
+            surface2 = "#4a4a4a",
+
+            pink = "#f2abb5",
+            mauve = "#9298ed",
+            green = "#3da94b",
+            teal = "#1d5224",
+            yellow = "#f8e8a0",
+            peach = "#037603",
+        },
+    }
+})
+vim.cmd.colorscheme "catppuccin"
+vim.api.nvim_set_hl(0, "@markup.raw.block.markdown", { link = "Text" })
+vim.api.nvim_set_hl(0, "@markup.raw.markdown_inline", { link = "Text" })
 
 local o = vim.opt
 local tw = 4
@@ -250,12 +247,12 @@ vim.lsp.enable("bashls")
 vim.lsp.enable("ts_ls")
 vim.lsp.config["ts_ls"] = {
     root_dir = function(_, callback)
-		local deno_dir = vim.fs.root(0, { "deno.json", "deno.jsonc" })
-		local root_dir = vim.fs.root(0, { "tsconfig.json", "jsconfig.json", "package.json" })
+        local deno_dir = vim.fs.root(0, { "deno.json", "deno.jsonc" })
+        local root_dir = vim.fs.root(0, { "tsconfig.json", "jsconfig.json", "package.json" })
 
-		if root_dir and deno_dir == nil then
-			callback(root_dir)
-		end
+        if root_dir and deno_dir == nil then
+            callback(root_dir)
+        end
     end
 }
 vim.lsp.enable("denols")
