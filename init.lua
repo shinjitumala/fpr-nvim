@@ -373,7 +373,8 @@ require("telescope").setup {
                 height = { padding = 0 },
                 preview_width = 0.5
             }
-        }
+        },
+        borderchars = { " ", " ", " ", " ", " ", " ", " ", " " }
     },
     extensions = {
         file_browser = {
