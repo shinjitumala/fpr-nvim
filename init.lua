@@ -81,40 +81,6 @@ require("lazy").setup({
         },
         { 'airblade/vim-gitgutter' },
         {
-            'nvim-treesitter/nvim-treesitter',
-            build = ":TSUpdate",
-            main = "nvim-treesitter.configs",
-            opts = {
-                ensure_installed = {
-                    "bash",
-                    "awk",
-                    "c",
-                    "css",
-                    "csv",
-                    "cpp",
-                    "make",
-                    "ninja",
-                    "sql",
-                    "typescript",
-                    "json",
-                    "lua",
-                    "xml",
-                    "toml",
-                    "markdown_inline",
-                    "markdown",
-                    "html",
-                    "css",
-                    "yaml",
-                    "toml",
-                    "python",
-
-                },
-                highlight = {
-                    enable = true
-                }
-            }
-        },
-        {
             'saadparwaiz1/cmp_luasnip',
         },
     },
@@ -234,8 +200,8 @@ mf("n", "gr", function() vim.lsp.buf.references() end, opts)
 mf("n", "gs", function() vim.lsp.buf.signature_help() end, opts)
 mf("n", "gl", function() vim.diagnostic.open_float() end, opts)
 
-mf("n", "<C-k>d", function() vim.diagnostic.goto_next() end, opts)
-mf("n", "<C-k>D", function() vim.diagnostic.goto_prev() end, opts)
+mf("n", "<C-k>d", function() vim.diagnostic.jump({ count = 1 }) end, opts)
+mf("n", "<C-k>D", function() vim.diagnostic.jump({ count = -1 }) end, opts)
 
 m("n", "<A-e>", "<cmd>:Telescope file_browser<cr>", opts)
 -- m("n", "<C-k>fd", "<cmd>:Telescope find_files --hidden<cr>", opts)
@@ -401,6 +367,13 @@ require("telescope").setup {
                 ["<C-c>"] = actions.close,
             },
         },
+        layout_config = {
+            horizontal = {
+                width = { padding = 0 },
+                height = { padding = 0 },
+                preview_width = 0.5
+            }
+        }
     },
     extensions = {
         file_browser = {
