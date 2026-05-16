@@ -62,7 +62,58 @@ require("lazy").setup({
             "catppuccin/nvim",
             name = "catppuccin",
         },
-
+        {
+            "romus204/tree-sitter-manager.nvim",
+            config = function()
+                require("tree-sitter-manager").setup({
+                    ensure_installed = {
+                        "rust",
+                        "awk",
+                        "bash",
+                        "c",
+                        "cmake",
+                        "cpp",
+                        "css",
+                        "csv",
+                        "diff",
+                        "dot",
+                        "dockerfile",
+                        "git_config",
+                        "git_rebase",
+                        "gitattributes",
+                        "gitcommit",
+                        "gitignore",
+                        "html",
+                        "http",
+                        "ini",
+                        "javascript",
+                        "jinja",
+                        "jinja_inline",
+                        "jq",
+                        "json",
+                        "lua",
+                        "make",
+                        "markdown",
+                        "markdown_inline",
+                        "ninja",
+                        "powershell",
+                        "python",
+                        "regex",
+                        "requirements",
+                        "sql",
+                        "ssh_config",
+                        "tmux",
+                        "toml",
+                        "typescript",
+                        "vim",
+                        "xml",
+                        "xresources",
+                        "yaml",
+                    },
+                    auto_install = true, -- if enabled, install missing parsers when editing a new file
+                })
+            end
+        },
         {
             "numToStr/Comment.nvim",
             opts = {
@@ -232,8 +283,12 @@ vim.lsp.config["denols"] = {
     end
 }
 vim.lsp.enable("html")
-vim.lsp.enable("css_ls")
-vim.lsp.enable("json")
+vim.lsp.enable("jsonls")
+vim.lsp.enable("clangd")
+vim.lsp.enable("cmake")
+vim.lsp.enable("cssls")
+vim.lsp.enable("html")
+vim.lsp.enable("powershell_es")
 
 local action_state = require "telescope.actions.state"
 local actions = require "telescope.actions"
