@@ -569,7 +569,7 @@ local function load_salt_snip()
                 desc = desc,
             },
             f(function()
-                local body, serr = shell("salt-snip " .. vim.fn.shellescape(key))
+                local body, serr = shell("salt-snip " .. vim.fn.shellescape(key) .. " --interactive false")
                 if not body or body == "" then
                     vim.notify("salt-snip: no output for key: " .. key .. (serr and (": " .. serr) or ""),
                         vim.log.levels.WARN)
