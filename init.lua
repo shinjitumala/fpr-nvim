@@ -407,6 +407,32 @@ local function copy_windows_path(p)
     end
 end
 
+local function copy_path_with_selection()
+    local path = vim.fn.expand('%:p')
+    local mode = vim.api.nvim_get_mode().mode
+    local selection = nil
+
+    if mode == 'v' or mode == 'V' or mode == '\22' then
+        local saved_reg = vim.fn.getreg('"')
+        local saved_regtype = vim.fn.getregtype('"')
+        vim.cmd('noau normal! "vy')
+        selection = vim.fn.getreg('v')
+        vim.fn.setreg('"', saved_reg, saved_regtype)
+    end
+
+    local final_text
+    if selection and selection ~= "" then
+        final_text = string.format("`%s`:\n```\n%s\n```", path, selection)
+    else
+        final_text = path
+    end
+    copy(final_text)
+end
+
+mf({ "n", "v" }, "<A-c>", copy_path_with_selection, {
+    desc = "Copy file path and current selection to clipboard"
+})
+
 local fb_actions = require "telescope._extensions.file_browser.actions"
 require("telescope").setup {
     defaults = {
