@@ -529,3 +529,71 @@ mf("n", "<A-9>", function() harpoon:list():select(9) end)
 mf("n", "gt", function() harpoon:list():next() end)
 mf("n", "gT", function() harpoon:list():prev() end)
 -- }
+
+-- fpr-snip {
+local function load_salt_snip()
+    local ls = require("luasnip")
+    local s  = ls.snippet
+    local f  = ls.function_node
+
+    local function shell(cmd)
+        local handle, err = io.popen(cmd)
+        if not handle then
+            return nil, err
+        end
+        local output = handle:read("*a")
+        handle:close()
+        return output
+    end
+
+    local output, err = shell("salt-snip --list true")
+    if not output then
+        vim.notify("salt-snip: failed to run: " .. (err or "unknown error"), vim.log.levels.ERROR)
+        return
+    end
+
+    local ok, entries = pcall(vim.json.decode, output)
+    if not ok or type(entries) ~= "table" then
+        vim.notify("salt-snip: failed to parse JSON output", vim.log.levels.ERROR)
+        return
+    end
+
+    local by_lang = {}
+    for _, entry in ipairs(entries) do
+        local key   = entry.key
+        local desc  = entry.desc or ""
+        local langs = entry.languages or {}
+        local snip  = s(
+            {
+                trig = key,
+                desc = desc,
+            },
+            f(function()
+                local body, serr = shell("salt-snip " .. vim.fn.shellescape(key))
+                if not body or body == "" then
+                    vim.notify("salt-snip: no output for key: " .. key .. (serr and (": " .. serr) or ""),
+                        vim.log.levels.WARN)
+                    return { "" }
+                end
+                local lines = {}
+                for x in body:gmatch("[^\r\n]+") do
+                    table.insert(lines, x)
+                end
+                return lines
+            end)
+        )
+
+        for _, lang in ipairs(langs) do
+            if not by_lang[lang] then
+                by_lang[lang] = {}
+            end
+            table.insert(by_lang[lang], snip)
+        end
+    end
+    for lang, snips in pairs(by_lang) do
+        ls.add_snippets(lang, snips, { key = "salt-snip-" .. lang })
+    end
+end
+
+load_salt_snip()
+-- }
