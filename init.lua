@@ -399,7 +399,7 @@ local function copy_windows_path(p)
             },
             { text = true }):wait();
         if r.code ~= 0 then
-            vim.api.nvim_echo({ "Path command failed because " .. r.stdout, "ErrorMsg" })
+            vim.notify("Path command failed because " .. r.stdout, vim.log.levels.ERROR)
             return
         end
         local x = r.stdout
