@@ -259,6 +259,27 @@ m("n", "<A-e>", "<cmd>:Telescope file_browser<cr>", opts)
 
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("rust_analyzer")
+vim.lsp.config("rust_analyzer", {
+    -- Other Configs ...
+    settings = {
+        ["rust-analyzer"] = {
+            cargo = {
+                features = "all", -- Enable all features
+            },
+            -- Other Settings ...
+            --
+            procMacro = {
+                ignored = {
+                    leptos_macro = {
+                        -- optional: --
+                        -- "component",
+                        "server",
+                    },
+                },
+            },
+        },
+    }
+})
 vim.lsp.enable("taplo")
 vim.lsp.enable("bashls")
 vim.lsp.enable("ts_ls")
@@ -422,7 +443,11 @@ local function copy_path_with_selection()
 
     local final_text
     if selection and selection ~= "" then
-        final_text = string.format("`%s`:\n```\n%s\n```", path, selection)
+        if mode == 'V' then
+            final_text = string.format("`%s`:\n```\n%s```", path, selection)
+        else
+            final_text = string.format("`%s`:\n```\n%s\n```", path, selection)
+        end
     else
         final_text = path
     end
