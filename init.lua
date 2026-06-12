@@ -15,127 +15,13 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Setup lazy.nvim
-require("lazy").setup({
-    spec = {
-        {
-            "nvim-telescope/telescope.nvim",
-            dependencies = { "nvim-lua/plenary.nvim" }
-        },
-        {
-            "nvim-telescope/telescope-file-browser.nvim",
-            dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
-        },
-        {
-            "ThePrimeagen/harpoon",
-            branch = "harpoon2",
-            dependencies = { "nvim-lua/plenary.nvim" }
-        },
-        { "lewis6991/gitsigns.nvim" },
-        { "neovim/nvim-lspconfig" },
-        {
-            "hrsh7th/nvim-cmp",
-            opts = function()
-                local cmp = require("cmp")
-                local cmp_s = { behavior = cmp.SelectBehavior.Select }
-                return {
-                    mapping = cmp.mapping.preset.insert({
-                        ["<A-k>"] = cmp.mapping.select_prev_item(cmp_s),
-                        ["<A-j>"] = cmp.mapping.select_next_item(cmp_s),
-                        ["<CR>"] = cmp.mapping.confirm({ select = true }),
-                        ["<A-p>"] = cmp.mapping.scroll_docs(-4),
-                        ["<A-n>"] = cmp.mapping.scroll_docs(4),
-                        ["<A-i>"] = cmp.mapping.complete(),
-                    }),
-                    sources = {
-                        { name = 'luasnip' },
-                        { name = 'nvim_lsp' },
-                        { name = "buffer",  keyword_length = 3 },
-                    },
-                }
-            end
-        },
-        { "hrsh7th/cmp-nvim-lsp" },
-        { "L3MON4D3/LuaSnip" },
+local ok, env = pcall(require, "env")
+env = ok and env or {}
 
-        {
-            "catppuccin/nvim",
-            name = "catppuccin",
-        },
-        {
-            "romus204/tree-sitter-manager.nvim",
-            config = function()
-                require("tree-sitter-manager").setup({
-                    ensure_installed = {
-                        "rust",
-                        "awk",
-                        "bash",
-                        "c",
-                        "cmake",
-                        "cpp",
-                        "css",
-                        "csv",
-                        "diff",
-                        "dot",
-                        "dockerfile",
-                        "git_config",
-                        "git_rebase",
-                        "gitattributes",
-                        "gitcommit",
-                        "gitignore",
-                        "html",
-                        "http",
-                        "ini",
-                        "javascript",
-                        "jinja",
-                        "jinja_inline",
-                        "jq",
-                        "json",
-                        "lua",
-                        "make",
-                        "markdown",
-                        "markdown_inline",
-                        "ninja",
-                        "powershell",
-                        "python",
-                        "regex",
-                        "requirements",
-                        "sql",
-                        "ssh_config",
-                        "tmux",
-                        "toml",
-                        "typescript",
-                        "vim",
-                        "xml",
-                        "xresources",
-                        "yaml",
-                    },
-                    auto_install = true, -- if enabled, install missing parsers when editing a new file
-                })
-            end
-        },
-        {
-            "numToStr/Comment.nvim",
-            opts = {
-                toggler = {
-                    line = "cc",
-                    block = "cb",
-                },
-                opleader = {
-                    line = "cc",
-                    block = "cb",
-                },
-                mappings = {
-                    extra = false,
-                },
-            }
-        },
-        { 'airblade/vim-gitgutter' },
-        {
-            'saadparwaiz1/cmp_luasnip',
-        },
-    },
-})
+local lsp = env.lsp == true;
+
+-- Setup lazy.nvim
+require("lazy").setup({ { import = "plug" } })
 
 require("catppuccin").setup({
     color_overrides = {
@@ -190,15 +76,9 @@ o.updatetime = 16
 o.wrap = true
 
 vim.wo.number = true
-vim.opt.signcolumn = 'yes'
-vim.opt.termguicolors = true
-
-local hasenv, env = pcall(require, "env")
-if not hasenv then
-    env = {}
-end
-
-require("luasnip.loaders.from_vscode").lazy_load({ paths = env.snippets_dir })
+o.signcolumn = 'yes'
+o.termguicolors = true
+o.autoread = true
 
 if vim.fn.has("wsl") == 1 then
     vim.g.clipboard = {
@@ -215,101 +95,96 @@ if vim.fn.has("wsl") == 1 then
     }
 end
 
--- Keymaps
-local m = vim.api.nvim_set_keymap
-local mf = vim.keymap.set
-local opts = { noremap = true, silent = true, }
+local m = function(mode, key, f, desc)
+    vim.keymap.set(mode, key, f, { noremap = true, silent = true, desc = desc })
+end
 
-m("n", [[<C-k>l]], "<Cmd>winc l<CR>", opts)
-m("n", [[<C-k>h]], "<Cmd>winc h<CR>", opts)
-m("n", [[<C-k>k]], "<Cmd>winc k<CR>", opts)
-m("n", [[<C-k>j]], "<Cmd>winc j<CR>", opts)
-m("n", [[<C-k><S-l>]], "<Cmd>winc L<CR>", opts)
-m("n", [[<C-k><S-h>]], "<Cmd>winc H<CR>", opts)
-m("n", [[<C-k><S-k>]], "<Cmd>winc K<CR>", opts)
-m("n", [[<C-k><S-j>]], "<Cmd>winc J<CR>", opts)
+local wnav = {
+    "l", "h", "k", "j", "L", "H", "K", "J",
+}
+for _, n in ipairs(wnav) do
+    local k = "<C-k>" .. n
+    local c = "<Cmd>winc " .. n .. "<CR>"
+    m("n", k, c)
+    m("t", k, c)
+end
 
-m("t", [[<C-k>l]], "<Cmd>winc l<CR>", {})
-m("t", [[<C-k>h]], "<Cmd>winc h<CR>", {})
-m("t", [[<C-k>k]], "<Cmd>winc k<CR>", {})
-m("t", [[<C-k>j]], "<Cmd>winc j<CR>", {})
+m("n", "gq", "<cmd>nohl<cr>")
+m("n", "<Space>", "<Nop>")
+m("n", "<A-e>", "<cmd>:Telescope file_browser<cr>")
+-- m("n", "<C-k>fd", "<cmd>:Telescope find_files --hidden<cr>")
 
-m("n", "gq", "<cmd>nohl<cr>", opts)
+m("n", "<C-k>r", vim.lsp.buf.rename)
+m("n", "<C-k>m", vim.lsp.buf.format)
+m("n", "<S-K>", vim.lsp.buf.hover)
+m("n", "<C-K>.", vim.lsp.buf.code_action)
 
-m("n", "<Space>", "<Nop>", opts)
+m("n", "gd", vim.lsp.buf.definition)
+m("n", "gD", vim.lsp.buf.declaration)
+m("n", "gi", vim.lsp.buf.implementation)
+m("n", "gI", vim.lsp.buf.type_definition)
+m("n", "gr", vim.lsp.buf.references)
+m("n", "gs", vim.lsp.buf.signature_help)
+m("n", "gl", vim.diagnostic.open_float)
 
-mf("n", "<C-k>r", function() vim.lsp.buf.rename() end, opts)
-mf("n", "<C-k>m", function() vim.lsp.buf.format() end, opts)
-mf("n", "<S-K>", function() vim.lsp.buf.hover() end, opts)
-mf("n", "<C-K>.", function() vim.lsp.buf.code_action() end, opts)
+m("n", "<C-k>d", function() vim.diagnostic.jump({ count = 1 }) end)
+m("n", "<C-k>D", function() vim.diagnostic.jump({ count = -1 }) end)
 
-mf("n", "gd", function() vim.lsp.buf.definition() end, opts)
-mf("n", "gD", function() vim.lsp.buf.declaration() end, opts)
-mf("n", "gi", function() vim.lsp.buf.implementation() end, opts)
-mf("n", "gI", function() vim.lsp.buf.type_definition() end, opts)
-mf("n", "gr", function() vim.lsp.buf.references() end, opts)
-mf("n", "gs", function() vim.lsp.buf.signature_help() end, opts)
-mf("n", "gl", function() vim.diagnostic.open_float() end, opts)
+if lsp then
+    vim.lsp.enable("lua_ls")
+    -- vim.lsp.enable("rust_analyzer")
+    -- vim.lsp.config("rust_analyzer", {
+    --     -- Other Configs ...
+    --     settings = {
+    --         ["rust-analyzer"] = {
+    --             cargo = {
+    --                 features = "all", -- Enable all features
+    --             },
+    --             -- Other Settings ...
+    --             --
+    --             procMacro = {
+    --                 ignored = {
+    --                     leptos_macro = {
+    --                         -- optional: --
+    --                         -- "component",
+    --                         "server",
+    --                     },
+    --                 },
+    --             },
+    --         },
+    --     }
+    -- })
+    vim.lsp.enable("taplo")
+    vim.lsp.enable("bashls")
+    vim.lsp.enable("ts_ls")
+    vim.lsp.config["ts_ls"] = {
+        root_dir = function(_, callback)
+            local deno_dir = vim.fs.root(0, { "deno.json", "deno.jsonc" })
+            local root_dir = vim.fs.root(0, { "tsconfig.json", "jsconfig.json", "package.json" })
 
-mf("n", "<C-k>d", function() vim.diagnostic.jump({ count = 1 }) end, opts)
-mf("n", "<C-k>D", function() vim.diagnostic.jump({ count = -1 }) end, opts)
-
-m("n", "<A-e>", "<cmd>:Telescope file_browser<cr>", opts)
--- m("n", "<C-k>fd", "<cmd>:Telescope find_files --hidden<cr>", opts)
-
-vim.lsp.enable("lua_ls")
-vim.lsp.enable("rust_analyzer")
-vim.lsp.config("rust_analyzer", {
-    -- Other Configs ...
-    settings = {
-        ["rust-analyzer"] = {
-            cargo = {
-                features = "all", -- Enable all features
-            },
-            -- Other Settings ...
-            --
-            procMacro = {
-                ignored = {
-                    leptos_macro = {
-                        -- optional: --
-                        -- "component",
-                        "server",
-                    },
-                },
-            },
-        },
+            if root_dir and deno_dir == nil then
+                callback(root_dir)
+            end
+        end
     }
-})
-vim.lsp.enable("taplo")
-vim.lsp.enable("bashls")
-vim.lsp.enable("ts_ls")
-vim.lsp.config["ts_ls"] = {
-    root_dir = function(_, callback)
-        local deno_dir = vim.fs.root(0, { "deno.json", "deno.jsonc" })
-        local root_dir = vim.fs.root(0, { "tsconfig.json", "jsconfig.json", "package.json" })
+    vim.lsp.enable("denols")
+    vim.lsp.config["denols"] = {
+        root_dir = function(_, callback)
+            local root_dir = vim.fs.root(0, { "deno.json", "deno.jsonc" })
 
-        if root_dir and deno_dir == nil then
-            callback(root_dir)
+            if root_dir then
+                callback(root_dir)
+            end
         end
-    end
-}
-vim.lsp.enable("denols")
-vim.lsp.config["denols"] = {
-    root_dir = function(_, callback)
-        local root_dir = vim.fs.root(0, { "deno.json", "deno.jsonc" })
-
-        if root_dir then
-            callback(root_dir)
-        end
-    end
-}
-vim.lsp.enable("html")
-vim.lsp.enable("jsonls")
-vim.lsp.enable("clangd")
-vim.lsp.enable("cmake")
-vim.lsp.enable("cssls")
-vim.lsp.enable("html")
-vim.lsp.enable("powershell_es")
+    }
+    vim.lsp.enable("html")
+    vim.lsp.enable("jsonls")
+    vim.lsp.enable("clangd")
+    vim.lsp.enable("cmake")
+    vim.lsp.enable("cssls")
+    vim.lsp.enable("html")
+    vim.lsp.enable("powershell_es")
+end
 
 local action_state = require "telescope.actions.state"
 local actions = require "telescope.actions"
@@ -454,9 +329,7 @@ local function copy_path_with_selection()
     copy(final_text)
 end
 
-mf({ "n", "v" }, "<A-c>", copy_path_with_selection, {
-    desc = "Copy file path and current selection to clipboard"
-})
+m({ "n", "v" }, "<A-c>", copy_path_with_selection, "Copy file path and current selection to clipboard")
 
 local fb_actions = require "telescope._extensions.file_browser.actions"
 require("telescope").setup {
@@ -510,49 +383,49 @@ require("telescope").load_extension "file_browser"
 
 local tele = require("telescope.builtin")
 
-m("n", "<C-k><S-s>", [[:lua os.execute("source ~/.bashrc; slack_quote")<CR>p]], opts)
+m("n", "<C-k><S-s>", [[:lua os.execute("source ~/.bashrc; slack_quote")<CR>p]])
 
-mf("n", "<C-k>F", tele.find_files, opts)
-mf("n", "<C-k>ff", function()
+m("n", "<C-k>F", tele.find_files)
+m("n", "<C-k>ff", function()
     tele.live_grep({
         glob_pattern = { "*", "!.git" },
     })
-end, opts)
-mf("n", "<C-k>fa", function()
+end)
+m("n", "<C-k>fa", function()
     tele.live_grep({
         glob_pattern = { "*.md", "!.git" },
     })
-end, opts)
-mf("n", "<C-k>fg", tele.live_grep, opts)
-mf("n", "<C-k>fd", function()
+end)
+m("n", "<C-k>fg", tele.live_grep)
+m("n", "<C-k>fd", function()
     tele.find_files({
         hidden = true,
         follow = true,
     })
-end, opts)
+end)
 
-mf("n", "<C-k>c", '<cmd>let @+ = @%<CR>', opts)
-mf("n", "<C-k>C", '<cmd>let @+ = expand("%:p")<CR>', opts)
+m("n", "<C-k>c", '<cmd>let @+ = @%<CR>')
+m("n", "<C-k>C", '<cmd>let @+ = expand("%:p")<CR>')
 
 
 -- harpoon {
 local harpoon = require("harpoon")
 harpoon:setup()
-mf("n", "<A-a>", function() harpoon:list():add() end)
-mf("n", "<A-w>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+m("n", "<A-a>", function() harpoon:list():add() end)
+m("n", "<A-w>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 
-mf("n", "<A-1>", function() harpoon:list():select(1) end)
-mf("n", "<A-2>", function() harpoon:list():select(2) end)
-mf("n", "<A-3>", function() harpoon:list():select(3) end)
-mf("n", "<A-4>", function() harpoon:list():select(4) end)
-mf("n", "<A-5>", function() harpoon:list():select(5) end)
-mf("n", "<A-6>", function() harpoon:list():select(6) end)
-mf("n", "<A-7>", function() harpoon:list():select(7) end)
-mf("n", "<A-8>", function() harpoon:list():select(8) end)
-mf("n", "<A-9>", function() harpoon:list():select(9) end)
+m("n", "<A-1>", function() harpoon:list():select(1) end)
+m("n", "<A-2>", function() harpoon:list():select(2) end)
+m("n", "<A-3>", function() harpoon:list():select(3) end)
+m("n", "<A-4>", function() harpoon:list():select(4) end)
+m("n", "<A-5>", function() harpoon:list():select(5) end)
+m("n", "<A-6>", function() harpoon:list():select(6) end)
+m("n", "<A-7>", function() harpoon:list():select(7) end)
+m("n", "<A-8>", function() harpoon:list():select(8) end)
+m("n", "<A-9>", function() harpoon:list():select(9) end)
 
-mf("n", "gt", function() harpoon:list():next() end)
-mf("n", "gT", function() harpoon:list():prev() end)
+m("n", "gt", function() harpoon:list():next() end)
+m("n", "gT", function() harpoon:list():prev() end)
 -- }
 
 -- fpr-snip {
