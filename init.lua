@@ -79,6 +79,10 @@ vim.wo.number = true
 o.signcolumn = 'yes'
 o.termguicolors = true
 o.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+    command = "if mode() != 'c' | checktime | endif",
+    pattern = "*",
+})
 
 if vim.fn.has("wsl") == 1 then
     vim.g.clipboard = {
@@ -303,8 +307,8 @@ local function copy_windows_path(p)
     end
 end
 
-local function copy_path_with_selection()
-    local path = vim.fn.expand('%:p')
+local function copy_path_with_selection(absolute)
+    local path = absolute and vim.fn.expand('%:p') or vim.fn.expand('%')
     local mode = vim.api.nvim_get_mode().mode
     local selection = nil
 
@@ -329,7 +333,8 @@ local function copy_path_with_selection()
     copy(final_text)
 end
 
-m({ "n", "v" }, "<A-c>", copy_path_with_selection, "Copy file path and current selection to clipboard")
+m({ "n", "v" }, "<A-c>", function() copy_path_with_selection(false) end, "Copy relative file path and current selection to clipboard")
+m({ "n", "v" }, "<A-C>", function() copy_path_with_selection(true) end, "Copy absolute file path and current selection to clipboard")
 
 local fb_actions = require "telescope._extensions.file_browser.actions"
 require("telescope").setup {
@@ -433,6 +438,7 @@ local function load_salt_snip()
     local ls = require("luasnip")
     local s  = ls.snippet
     local f  = ls.function_node
+    local t  = ls.text_node
 
     local function shell(cmd)
         local handle, err = io.popen(cmd)
@@ -466,7 +472,7 @@ local function load_salt_snip()
                 trig = key,
                 desc = desc,
             },
-            f(function()
+            f(function(_, _, _)
                 local body, serr = shell("salt-snip " .. vim.fn.shellescape(key) .. " --interactive false")
                 if not body or body == "" then
                     vim.notify("salt-snip: no output for key: " .. key .. (serr and (": " .. serr) or ""),
@@ -474,11 +480,12 @@ local function load_salt_snip()
                     return { "" }
                 end
                 local lines = {}
-                for x in body:gmatch("[^\r\n]+") do
+                local b = body:match("\n$") and body or body .. "\n"
+                for x in b:gmatch("([^\n\r]*)\r?\n") do
                     table.insert(lines, x)
                 end
                 return lines
-            end)
+            end, {}, {})
         )
 
         for _, lang in ipairs(langs) do
